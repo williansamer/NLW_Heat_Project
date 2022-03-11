@@ -3,6 +3,7 @@ import express  from "express";
 import { routes } from "./routes";
 import http from 'http';
 import { Server } from "socket.io";
+import cors from "cors";
 
 const app = express();
 
@@ -15,6 +16,7 @@ const io = new Server(serverHttp, {cors: { //Criando o server. Colocando o 'cors
 //Ouvindo(on) a 'connection'
 io.on("connection", socket=>console.log(`Server Connect on socket ${socket.id}`));
 
+app.use(cors())
 app.use(express.json());
 app.use(routes);
 

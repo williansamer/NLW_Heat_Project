@@ -1,48 +1,46 @@
+import {api} from '../../services/api';
+
 import styles from "./styles.module.scss";
 import logo from "../../assets/logo.svg";
+import { useEffect, useState } from 'react';
+
+type Message = {
+  id: string;
+  text: string;
+  user: {
+    name: string;
+    avatar_url: string;
+  }
+}
 
 export function MessageList() {
+  const [messages, setMessages] = useState<Message[]>([]);
+
+  useEffect(()=>{
+    api.get<Message[]>('/messages/last3').then(response=>setMessages(response.data));
+  }, [])
+
   return (
     <div className={styles.messageListWrapper}>
       <img src={logo} alt="" />
 
       <ul className={styles.messageList}>
 
-        <li className={styles.message}>
-          <p className={styles.messageContet}>
-            Um grande solucionador de problemas e com grande potencial de crescimento graças a minha força de vontade. Este sou eu. Só preciso de uma oportunidade para mostrar tudo o que tenho a oferecer.
-          </p>
-          <div className={styles.messageUser}>
-            <div className={styles.userImage}>
-              <img src="https://www.github.com/williansamer.png" alt="Willian Samer" />
+      {messages.map((message)=>{
+        return (
+          <li key={message.id} className={styles.message}>
+            <p className={styles.messageContet}>
+              {message.text}
+            </p>
+            <div className={styles.messageUser}>
+              <div className={styles.userImage}>
+                <img src={message.user.avatar_url} alt={message.user.name} />
+              </div>
+              <span>{message.user.name}</span>
             </div>
-            <span>Willian Samer</span>
-          </div>
-        </li>
-
-        <li className={styles.message}>
-          <p className={styles.messageContet}>
-            Um grande solucionador de problemas e com grande potencial de crescimento graças a minha força de vontade. Este sou eu. Só preciso de uma oportunidade para mostrar tudo o que tenho a oferecer.
-          </p>
-          <div className={styles.messageUser}>
-            <div className={styles.userImage}>
-              <img src="https://www.github.com/williansamer.png" alt="Willian Samer" />
-            </div>
-            <span>Willian Samer</span>
-          </div>
-        </li>
-
-        <li className={styles.message}>
-          <p className={styles.messageContet}>
-            Um grande solucionador de problemas e com grande potencial de crescimento graças a minha força de vontade. Este sou eu. Só preciso de uma oportunidade para mostrar tudo o que tenho a oferecer.
-          </p>
-          <div className={styles.messageUser}>
-            <div className={styles.userImage}>
-              <img src="https://www.github.com/williansamer.png" alt="Willian Samer" />
-            </div>
-            <span>Willian Samer</span>
-          </div>
-        </li>
+          </li>
+        )
+      })}
 
       </ul>
     </div>
