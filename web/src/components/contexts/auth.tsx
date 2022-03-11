@@ -47,6 +47,7 @@ export function AuthProvider(props: AuthProviderType) {
     const {token, user } = response.data;
 
     localStorage.setItem("@github:token", token);
+    api.defaults.headers.common.authorization = `Bearer ${token}`;
     setUser(user);
   }
 

@@ -1,10 +1,23 @@
 import styles from "./styles.module.scss";
 import { VscSignOut, VscGithubInverted } from "react-icons/vsc";
 import { AuthContext } from "../contexts/auth";
-import { useContext } from "react";
+import { useContext, useState, FormEvent } from "react";
+import { api } from "../../services/api";
 
 export function SendMessageForm(){
   const {user, signOut} = useContext(AuthContext);
+  const [message, setMessage] = useState("");
+
+  async function handleSendMessage(event: FormEvent){
+    event.preventDefault();
+
+    if(!message.trim()){ // if message is empty, do nothing. 'trim' removes whitespace from the beginning and end of the string.
+      return;
+    }
+
+    await api.post("messages", {message})
+    setMessage("");
+  }
 
   return(
     <div className={styles.sendMessageFormWrapper}>
@@ -23,12 +36,14 @@ export function SendMessageForm(){
         </span>
       </header>
 
-      <form className={styles.sendMessageForm}>
+      <form onSubmit={handleSendMessage} className={styles.sendMessageForm}>
         <label htmlFor="message">Mensagem</label>
         <textarea 
         name="message" 
         id="message" 
         placeholder="Digite sua mensagem" 
+        onChange={event=>setMessage(event.target.value)}
+        value={message}
         />
 
         <button type="submit">Enviar Mensagem</button>
