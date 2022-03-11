@@ -13,9 +13,10 @@ type User = {
   name: string;
 }
 
-type AuthContextData = { /* Ligação das propriedades com o value do AuthContext.Provider */
+type AuthContextData = { //Ligação das propriedades com o value do AuthContext.Provider
   user: User | null;
   signInUrl: string;
+  signOut: ()=>void; //signOut é uma função que retorna void(não tem retorno)
 }
 
 type AuthType = {
@@ -34,6 +35,11 @@ export function AuthProvider(props: AuthProviderType) {
   const [user, setUser] = useState<User | null>(null)
 
   const signInUrl = `https://github.com/login/oauth/authorize?scope=user&client_id=0e54352158a7196179b5`;
+
+  function signOut(){
+    setUser(null);
+    localStorage.removeItem("@github:token");
+  }
 
   async function signIn(code: string){
     const response = await api.post<AuthType>("authenticate", {code}); /* code no corpo da api. Poderia estar como params se no backend estivesse */
@@ -57,8 +63,18 @@ export function AuthProvider(props: AuthProviderType) {
     }
   }, [])
 
+  useEffect(()=>{
+    const token = localStorage.getItem("@github:token");
+
+    if(token){
+      api.defaults.headers.common.authorization = `Bearer ${token}`;
+
+      api.get<User>("profile").then(response => setUser(response.data));
+    }
+  }, [])
+
   return(
-    <AuthContext.Provider value={{user, signInUrl}}>
+    <AuthContext.Provider value={{user, signInUrl, signOut}}>
       {props.children}
     </AuthContext.Provider>
   )
